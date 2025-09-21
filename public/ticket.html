@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Электронный билет</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #e0eafc, #cfdef3);
+            display: flex;
+            justify-content: center;
+            padding: 50px 20px;
+            margin: 0;
+        }
+
+        .ticket {
+            background: #fff;
+            border-radius: 15px;
+            width: 600px;
+            max-width: 100%;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+            overflow: hidden;
+            padding-bottom: 20px;
+        }
+
+        .qr-section {
+            text-align: center;
+            padding: 20px;
+            background: #f9f9f9;
+            border-bottom: 1px dashed #ccc;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .qr-section img {
+            width: 350px;
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .ticket-number {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #007bff;
+        }
+
+        .progress-bar {
+            width: 233px;
+            max-width: 80%;
+            height: 20px;
+            background: #ddd;
+            border-radius: 10px;
+            margin: 0 auto 20px auto;
+            position: relative;
+            overflow: hidden;
+            padding: 2px;
+            box-sizing: border-box;
+        }
+
+        .progress-ball {
+            width: 20px;
+            height: 16px;
+            background: #4caf50;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .header {
+            text-align: center;
+            padding: 15px 20px;
+            border-bottom: 2px dashed #ccc;
+        }
+        .header h2 {
+            margin: 0;
+            font-size: 22px;
+            color: #007bff;
+        }
+
+        .details {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 12px;
+        }
+
+        .field {
+            display: flex;
+            align-items: center;
+            background: #f1f5f9;
+            padding: 12px 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        }
+
+        .field i {
+            font-size: 18px;
+            color: #007bff;
+            margin-right: 10px;
+            width: 25px;
+            text-align: center;
+        }
+
+        .label { font-weight: bold; color: #555; margin-right: 5px; }
+        .value { font-size: 16px; color: #000; display: flex; flex-direction: column; }
+
+        .row {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .row .field {
+            flex: 1;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            border-top: 1px dashed #ccc;
+            padding: 10px 20px;
+            margin-top: 10px;
+        }
+
+        @media(max-width: 768px){
+            .ticket { width: 100%; padding-bottom: 15px; }
+            .header h2 { font-size: 20px; }
+            .progress-bar { width: 70%; }
+            .row { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="ticket">
+    <div class="qr-section">
+        <img id="qrcode" src="" alt="QR код">
+        <div class="ticket-number" id="ticketNumber"></div>
+        <div class="progress-bar"><div class="progress-ball" id="progressBall"></div></div>
+    </div>
+
+    <div class="header"><h2>ЭЛЕКТРОННЫЙ ПРОЕЗДНОЙ БИЛЕТ</h2></div>
+
+    <div class="details">
+        <div class="field"><i class="fa-solid fa-user"></i><span class="label">Имя, фамилия:</span> <span class="value" id="fullname"></span></div>
+        <div class="field"><i class="fa-solid fa-calendar-days"></i><span class="label">Дата рождения:</span> <span class="value" id="birthdate"></span></div>
+
+        <div class="row">
+            <div class="field">
+                <i class="fa-solid fa-calendar-days"></i>
+                <span class="label">Отправление:</span>
+                <span class="value">
+          <span id="departureDate"></span>
+          <span id="departureTime"></span>
+        </span>
+            </div>
+            <div class="field">
+                <i class="fa-solid fa-clock"></i>
+                <span class="label">Прибытие:</span>
+                <span class="value">
+          <span id="arrivalDate"></span>
+          <span id="arrivalTime"></span>
+        </span>
+            </div>
+        </div>
+
+        <div class="field"><i class="fa-solid fa-chair"></i><span class="label">Место:</span> <span class="value" id="place"></span></div>
+        <div class="field"><i class="fa-solid fa-couch"></i><span class="label">Класс вагона:</span> <span class="value" id="class"></span></div>
+    </div>
+
+    <div class="footer">
+        Билет действителен только на указанную дату и время.<br>
+        Передача другим лицам запрещена. Возврат невозможен.<br>
+        Проверка производится при посадке.
+    </div>
+</div>
+
+<script>
+    // Получаем ключ билета из URL
+    const params = new URLSearchParams(location.search);
+    const key = params.get('key');
+
+    if(!key){
+        alert('Билет не найден!');
+    }
+
+    // Элементы
+    const qrcodeEl = document.getElementById('qrcode');
+    const fullnameEl = document.getElementById('fullname');
+    const birthdateEl = document.getElementById('birthdate');
+    const departureDateEl = document.getElementById('departureDate');
+    const departureTimeEl = document.getElementById('departureTime');
+    const arrivalDateEl = document.getElementById('arrivalDate');
+    const arrivalTimeEl = document.getElementById('arrivalTime');
+    const placeEl = document.getElementById('place');
+    const classEl = document.getElementById('class');
+    const ticketNumberEl = document.getElementById('ticketNumber');
+
+    // Прогресс-бегунок
+    const ball = document.getElementById('progressBall');
+    const bar = ball.parentElement;
+    let pos = 0, speed = 2, direction = 1;
+    function animate() {
+        const maxPos = bar.clientWidth - ball.clientWidth;
+        pos += speed * direction;
+        if(pos >= maxPos){ pos = maxPos; direction = -1; }
+        else if(pos <= 0){ pos = 0; direction = 1; }
+        ball.style.left = pos + 'px';
+        requestAnimationFrame(animate);
+    }
+    animate();
+
+    // Загружаем данные с сервера
+    fetch(`/api/tickets/${key}`)
+        .then(res => {
+            if(!res.ok) throw new Error('Ticket not found');
+            return res.json();
+        })
+        .then(ticket => {
+            qrcodeEl.src = ticket.qrcode || '';
+            fullnameEl.textContent = ticket.fullname || '-';
+            birthdateEl.textContent = ticket.birthdate || '-';
+
+            const [depDate, depTime] = (ticket.departure || '- - -').split(' - ');
+            const [arrDate, arrTime] = (ticket.arrival || '- - -').split(' - ');
+
+            departureDateEl.textContent = depDate;
+            departureTimeEl.textContent = depTime;
+            arrivalDateEl.textContent = arrDate;
+            arrivalTimeEl.textContent = arrTime;
+
+            placeEl.textContent = ticket.place || '-';
+            classEl.textContent = ticket.class || '-';
+            ticketNumberEl.textContent = ticket.ticketNumber ? `Билет № ${ticket.ticketNumber}` : '';
+        })
+        .catch(err => {
+            alert('Билет не найден на сервере!');
+            console.error(err);
+        });
+</script>
+
+</body>
+</html>

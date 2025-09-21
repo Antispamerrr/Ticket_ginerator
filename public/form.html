@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Генератор билета</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f0f2f5; padding: 40px; }
+        h1 { text-align: center; }
+        form { max-width: 500px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        label { display: block; margin-bottom: 10px; }
+        input { width: 100%; padding: 8px; margin-top: 4px; border-radius: 5px; border: 1px solid #ccc; }
+        button { margin-top: 15px; padding: 10px 15px; background: #007bff; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        #result { margin-top: 20px; text-align: center; }
+        #result a { display: block; word-break: break-all; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<h1>Создание билета</h1>
+
+<form id="ticketForm">
+    <label>Имя и фамилия:<input type="text" name="fullname" required></label>
+    <label>Дата рождения:<input type="date" name="birthdate" required></label>
+    <label>Время отправления:<input type="text" name="departure" placeholder="ГГГГ-ММ-ДД - ЧЧ:ММ" required></label>
+    <label>Время прибытия:<input type="text" name="arrival" placeholder="ГГГГ-ММ-ДД - ЧЧ:ММ" required></label>
+    <label>Место:<input type="text" name="place" required></label>
+    <label>Класс вагона:<input type="text" name="class" required></label>
+    <label>Номер билета:<input type="text" name="ticketNumber" required></label>
+    <label>QR-код (файл изображения):<input type="file" id="qrfile" accept="image/*" required></label>
+    <button type="submit">Сгенерировать ссылку на билет</button>
+    <button type="button" id="manageBtn">Управление билетами</button>
+</form>
+
+<div id="result"></div>
+
+<script>
+    const form = document.getElementById('ticketForm');
+    const qrInput = document.getElementById('qrfile');
+
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        const data = new FormData(form);
+        const file = qrInput.files[0];
+        if(!file) return alert('Выберите файл QR-кода!');
+
+        const reader = new FileReader();
+        reader.onload = function(e){
+            const qrBase64 = e.target.result;
+
+            const ticketData = {
+                fullname: data.get('fullname'),
+                birthdate: data.get('birthdate'),
+                departure: data.get('departure'),
+                arrival: data.get('arrival'),
+                place: data.get('place'),
+                class: data.get('class'),
+                ticketNumber: data.get('ticketNumber'),
+                qrcode: qrBase64
+            };
+
+            fetch('/api/tickets', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(ticketData)
+            })
+                .then(res => res.json())
+                .then(resp => {
+                    const ticketUrl = 'ticket.html?key=' + resp.key;
+                    document.getElementById('result').innerHTML = `
+        <p>Ссылка на билет:</p>
+        <a href="${ticketUrl}" target="_blank">${ticketUrl}</a>
+      `;
+                    form.reset();
+                });
+        }
+        reader.readAsDataURL(file);
+    });
+    document.getElementById('manageBtn').addEventListener('click', () => {
+        window.location.href = 'manage_tickets.html';
+    });
+</script>
+
+</body>
+</html>
