@@ -157,21 +157,41 @@
             max-width: 398px;
             text-align: left;
         }
+             /* Мобильная адаптация на весь экран */
         @media (max-width: 480px) {
+            html, body {
+                padding: 0;
+                margin: 0;
+                width: 100%;
+                height: 100%;
+            }
+
+            .main-container {
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+            }
+
+            .ticket-container {
+                width: 100%;
+                border-radius: 0; /* можно убрать радиус, чтобы заняло весь экран */
+                box-shadow: none; /* убрать тень на мобильном */
+            }
+
             .ticket-qr img {
-                width: 90%;       /* подстраиваем под экран */
-                height: auto;     /* сохраняем пропорции */
+                width: 100%;
+                height: auto; /* сохраняем пропорции QR-кода */
             }
 
             .ticket-logos img {
-                max-width: 30%;   /* уменьшение логотипа на маленьком экране */
+                max-width: 25%;
                 height: auto;
             }
 
             .ticket-number {
                 font-size: 1rem;
                 padding: 8px 0;
-                margin: 1rem;
+                margin: 1rem 0;
             }
 
             .ticket-slider {
