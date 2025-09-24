@@ -17,18 +17,20 @@
 </head>
 <body>
 
-<h1>Создание билета</h1>
+<h1>Создание / Редактирование билета</h1>
 
 <form id="ticketForm">
     <label>Имя и фамилия:<input type="text" name="fullname" required></label>
     <label>Дата рождения:<input type="date" name="birthdate" required></label>
-    <label>Время отправления:<input type="text" name="departure" placeholder="ГГГГ-ММ-ДД - ЧЧ:ММ" required></label>
-    <label>Время прибытия:<input type="text" name="arrival" placeholder="ГГГГ-ММ-ДД - ЧЧ:ММ" required></label>
+    <label>Время отправления:<input type="datetime-local" name="departure" required></label>
+    <label>Время прибытия:<input type="datetime-local" name="arrival" required></label>
+    <label>Дата выдачи (Ausgestellt):<input type="datetime-local" name="issuedAt" required></label>
     <label>Место:<input type="text" name="place" required></label>
     <label>Класс вагона:<input type="text" name="class" required></label>
     <label>Номер билета:<input type="text" name="ticketNumber" required></label>
-    <label>QR-код (файл изображения):<input type="file" id="qrfile" accept="image/*" required></label>
-    <button type="submit">Сгенерировать ссылку на билет</button>
+    <label>Preisstufe:<input type="text" name="priceLevel" required></label>
+    <label>QR-код (файл изображения):<input type="file" id="qrfile" accept="image/*"></label>
+    <button type="submit">Сохранить билет</button>
     <button type="button" id="manageBtn">Управление билетами</button>
 </form>
 
@@ -36,49 +38,122 @@
 
 <script>
     const form = document.getElementById('ticketForm');
-    const qrInput = document.getElementById('qrfile');
+    const manageBtn = document.getElementById('manageBtn');
+    let editKey = null;
 
-    form.addEventListener('submit', e => {
+    window.addEventListener('DOMContentLoaded', async () => {
+        const params = new URLSearchParams(window.location.search);
+        editKey = params.get('editKey');
+        if (!editKey) return;
+
+        try {
+            const res = await fetch('/api/tickets');
+            const tickets = await res.json();
+            const ticket = tickets.find(t => t.key === editKey);
+            if (!ticket) return alert('Билет с таким ключом не найден');
+
+            form.fullname.value = ticket.fullname;
+            form.birthdate.value = ticket.birthdate;
+            form.departure.value = ticket.validFromISO || '';
+            form.arrival.value = ticket.validUntilISO || '';
+            form.issuedAt.value = ticket.issuedAt || '';
+            form.place.value = ticket.place;
+            form.class.value = ticket.class;
+            form.priceLevel.value = ticket.priceLevel || '';
+            form.ticketNumber.value = ticket.ticketNumber;
+
+            if(ticket.qrcode){
+                const qrPreview = document.createElement('img');
+                qrPreview.src = ticket.qrcode;
+                qrPreview.style.width = '100px';
+                qrPreview.style.display = 'block';
+                qrPreview.style.marginTop = '10px';
+                form.appendChild(qrPreview);
+            }
+        } catch(err){
+            console.error(err);
+        }
+    });
+
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const data = new FormData(form);
-        const file = qrInput.files[0];
-        if(!file) return alert('Выберите файл QR-кода!');
+        const departureISO = data.get('departure');
+        const arrivalISO = data.get('arrival');
+        const issuedAtISO = data.get('issuedAt'); // <-- changed
 
-        const reader = new FileReader();
-        reader.onload = function(e){
-            const qrBase64 = e.target.result;
+        const ticketData = {
+            fullname: data.get('fullname'),
+            birthdate: data.get('birthdate'),
+            validFrom: formatDateTimeForTicket(departureISO),
+            validFromISO: departureISO,
+            validUntil: formatDateTimeForTicket(arrivalISO),
+            validUntilISO: arrivalISO,
+            issuedAt: formatIssuedAt(issuedAtISO), // <-- changed
+            issuedAtISO: issuedAtISO,              // <-- changed
+            region: 'Deutschlandweit',
+            class: form.elements['class'].value,   // <-- safer access
+            priceLevel: data.get('priceLevel'),
+            ticketNumber: data.get('ticketNumber'),
+            qrcode: ''
+        };
 
-            const ticketData = {
-                fullname: data.get('fullname'),
-                birthdate: data.get('birthdate'),
-                departure: data.get('departure'),
-                arrival: data.get('arrival'),
-                place: data.get('place'),
-                class: data.get('class'),
-                ticketNumber: data.get('ticketNumber'),
-                qrcode: qrBase64
+        const file = document.getElementById('qrfile').files[0];
+        if(file){
+            const reader = new FileReader();
+            reader.onload = async (ev) => {
+                ticketData.qrcode = ev.target.result;
+                await submitTicket(ticketData);
             };
-
-            fetch('/api/tickets', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(ticketData)
-            })
-                .then(res => res.json())
-                .then(resp => {
-                    const ticketUrl = 'ticket.html?key=' + resp.key;
-                    document.getElementById('result').innerHTML = `
-        <p>Ссылка на билет:</p>
-        <a href="${ticketUrl}" target="_blank">${ticketUrl}</a>
-      `;
-                    form.reset();
-                });
+            reader.readAsDataURL(file);
+        } else {
+            await submitTicket(ticketData);
         }
-        reader.readAsDataURL(file);
     });
-    document.getElementById('manageBtn').addEventListener('click', () => {
+
+    async function submitTicket(ticketData){
+        try {
+            let res;
+            if(editKey){
+                res = await fetch(`/api/tickets/${editKey}`, {
+                    method: 'PUT',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify(ticketData)
+                });
+            } else {
+                res = await fetch('/api/tickets', {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify(ticketData)
+                });
+            }
+
+            if(!res.ok) throw new Error('Ошибка при сохранении билета');
+            const resp = await res.json();
+            const ticketUrl = `ticket.html?key=${resp.key}`;
+            document.getElementById('result').innerHTML = `<p>Ссылка на билет:</p><a href="${ticketUrl}" target="_blank">${ticketUrl}</a>`;
+            form.reset();
+        } catch(err){
+            alert(err.message);
+            console.error(err);
+        }
+    }
+
+    manageBtn.addEventListener('click', () => {
         window.location.href = 'manage_tickets.html';
     });
+
+    // Форматирование
+    function formatDateTimeForTicket(inputDate) {
+        const date = new Date(inputDate);
+        const pad = n => String(n).padStart(2,'0');
+        return `${pad(date.getDate())}.${pad(date.getMonth()+1)}.${date.getFullYear()} - ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    }
+    function formatIssuedAt(inputDate) {
+        const date = new Date(inputDate);
+        const pad = n => String(n).padStart(2,'0');
+        return `${pad(date.getDate())}.${pad(date.getMonth()+1)}.${date.getFullYear()}, ${pad(date.getHours())}:${pad(date.getMinutes())} Uhr`;
+    }
 </script>
 
 </body>

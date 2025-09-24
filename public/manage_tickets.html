@@ -6,38 +6,49 @@
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; background: #f0f2f5; }
         h1 { text-align: center; margin-bottom: 10px; }
-        #search { width: 100%; max-width: 400px; margin: 10px auto 20px; display:block; padding: 8px; border-radius: 5px; border:1px solid #ccc; }
         table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; }
         th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
         th { background: #007bff; color: #fff; }
         tr:hover { background: #f1f5f9; }
         button { padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; background: #28a745; color: #fff; }
         button:hover { background: #218838; }
-        a { color:#007bff; text-decoration:none; }
-        a:hover { text-decoration:underline; }
-        .modal { display: none; position: fixed; top: 0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
-        .modal-content { background:#fff; padding:20px; border-radius:10px; max-width:500px; width:100%; position:relative; }
-        label { display:block; margin:10px 0 5px; }
-        input { width:100%; padding:6px; border-radius:5px; border:1px solid #ccc; }
-        .modal button { margin-top:10px; background:#007bff; }
-        .modal button:hover { background:#0056b3; }
-        .close { position:absolute; top:10px; right:15px; font-size:18px; cursor:pointer; color:#333; }
+
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            top:0; left:0; right:0; bottom:0;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            width: 420px;
+        }
+        .modal-content h2 { margin-top: 0; }
+        .modal-content label { display: block; margin: 8px 0; }
+        .modal-content input { width: 100%; padding: 6px; margin-top: 4px; }
+        .modal-content img { display: block; margin: 10px auto; max-width: 200px; }
+        .modal-content .actions { margin-top: 10px; text-align: right; }
+        .modal-content .actions button { margin-left: 10px; }
     </style>
 </head>
 <body>
 
 <h1>Управление билетами</h1>
-<input type="text" id="search" placeholder="Поиск по имени или номеру билета">
-
 <table id="ticketsTable">
     <thead>
     <tr>
         <th>№</th>
         <th>Имя</th>
         <th>Дата рождения</th>
-        <th>Отправление</th>
-        <th>Прибытие</th>
-        <th>Место</th>
+        <th>Начало действия</th>
+        <th>Окончание действия</th>
+        <th>Выдан</th>
+        <th>Место действия</th>
         <th>Класс</th>
         <th>Редактировать</th>
         <th>Ссылка</th>
@@ -46,118 +57,140 @@
     <tbody></tbody>
 </table>
 
+<!-- Модальное окно редактирования -->
 <div class="modal" id="editModal">
     <div class="modal-content">
-        <span class="close" id="closeModal">&times;</span>
-        <h2>Редактировать билет</h2>
+        <h2>Редактирование билета</h2>
         <form id="editForm">
-            <label>Имя и фамилия:<input type="text" name="fullname"></label>
-            <label>Дата рождения:<input type="date" name="birthdate"></label>
-            <label>Время отправления:<input type="text" name="departure" placeholder="ГГГГ-ММ-ДД - ЧЧ:ММ"></label>
-            <label>Время прибытия:<input type="text" name="arrival" placeholder="ГГГГ-ММ-ДД - ЧЧ:ММ"></label>
-            <label>Место:<input type="text" name="place"></label>
-            <label>Класс вагона:<input type="text" name="class"></label>
-            <label>Номер билета:<input type="text" name="ticketNumber"></label>
-            <label>QR-код (файл изображения):<input type="file" name="qrcodeFile" accept="image/*"></label>
-            <button type="submit">Сохранить изменения</button>
+            <input type="hidden" name="key">
+            <label>Имя: <input type="text" name="fullname" required></label>
+            <label>Дата рождения: <input type="date" name="birthdate" required></label>
+            <label>Начало действия: <input type="datetime-local" name="validFromISO" required></label>
+            <label>Окончание действия: <input type="datetime-local" name="validUntilISO" required></label>
+            <label>Дата выдачи (Ausgestellt): <input type="datetime-local" name="issuedAtISO" required></label>
+            <label>Место: <input type="text" name="region" required></label>
+            <label>Класс: <input type="text" name="class" required></label>
+            <label>Preisstufe: <input type="text" name="priceLevel" required></label>
+            <label>Номер билета: <input type="text" name="ticketNumber" required></label>
+            <label>QR-код (новый, если нужно заменить):
+                <input type="file" id="qrfile" accept="image/*">
+            </label>
+            <img id="qrPreview" alt="QR Code">
+            <div class="actions">
+                <button type="button" onclick="closeModal()">Отмена</button>
+                <button type="submit">Сохранить</button>
+            </div>
         </form>
     </div>
 </div>
 
 <script>
-    const tableBody = document.querySelector('#ticketsTable tbody');
-    const modal = document.getElementById('editModal');
-    const closeModal = document.getElementById('closeModal');
-    const editForm = document.getElementById('editForm');
-    let tickets = [];
-    let currentKey = null;
+    let ticketsList = [];
+    let currentTicket = null;
 
-    // Получаем билеты с сервера
-    function fetchTickets(){
-        fetch('/api/tickets')
-            .then(res=>res.json())
-            .then(data=>{
-                tickets = data;
-                renderTable(filteredTickets());
-            });
+    async function fetchTickets() {
+        const res = await fetch('/api/tickets');
+        ticketsList = await res.json();
+        renderTable(ticketsList);
     }
 
-    // Отображение таблицы
-    function renderTable(filteredTickets = tickets){
+    function renderTable(tickets) {
+        const tableBody = document.querySelector('#ticketsTable tbody');
         tableBody.innerHTML = '';
-        filteredTickets.forEach((ticket, index)=>{
+        tickets.forEach(ticket => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-      <td>${ticket.ticketNumber || index+1}</td>
+      <td>${ticket.ticketNumber}</td>
       <td>${ticket.fullname}</td>
       <td>${ticket.birthdate}</td>
-      <td>${ticket.departure}</td>
-      <td>${ticket.arrival}</td>
-      <td>${ticket.place}</td>
+      <td>${ticket.validFrom}</td>
+      <td>${ticket.validUntil}</td>
+      <td>${ticket.issuedAt}</td>
+      <td>${ticket.region}</td>
       <td>${ticket.class}</td>
+<td>${ticket.priceLevel}</td>
       <td><button data-key="${ticket.key}">Редактировать</button></td>
       <td><a href="ticket.html?key=${ticket.key}" target="_blank">Открыть</a></td>
     `;
             tableBody.appendChild(tr);
         });
+
+        document.querySelectorAll('button[data-key]').forEach(btn => {
+            btn.addEventListener('click', () => openEditModal(btn.dataset.key));
+        });
     }
 
-    // Модальное окно редактирования
-    tableBody.addEventListener('click', e=>{
-        if(e.target.tagName==='BUTTON'){
-            const key = e.target.dataset.key;
-            currentKey = key;
-            const ticket = tickets.find(t=>t.key===key);
-            for(const name in ticket){
-                if(editForm[name]) editForm[name].value = ticket[name];
-            }
-            modal.style.display = 'flex';
-        }
-    });
+    function openEditModal(key) {
+        currentTicket = ticketsList.find(t => t.key === key);
+        if (!currentTicket) return;
 
-    closeModal.onclick = () => modal.style.display = 'none';
-    window.onclick = e => { if(e.target===modal) modal.style.display = 'none'; }
+        editForm.key.value = currentTicket.key;
+        editForm.fullname.value = currentTicket.fullname;
+        editForm.birthdate.value = currentTicket.birthdate;
+        editForm.validFromISO.value = currentTicket.validFromISO || '';
+        editForm.validUntilISO.value = currentTicket.validUntilISO || '';
+        editForm.issuedAtISO.value = currentTicket.issuedAtISO || '';
+        editForm.region.value = currentTicket.region || '';
+        editForm.priceLevel.value = currentTicket.priceLevel || '';
+        editForm.class.value = currentTicket.class || '';
+        editForm.ticketNumber.value = currentTicket.ticketNumber;
+        qrPreview.src = currentTicket.qrcode || '';
 
-    // Сохранение изменений
-    editForm.addEventListener('submit', e=>{
+        editModal.style.display = 'flex';
+    }
+
+    editForm.addEventListener('submit', async e => {
         e.preventDefault();
-        const updated = {};
-        for(const elem of editForm.elements){
-            if(elem.name && elem.name!=='qrcodeFile') updated[elem.name] = elem.value;
+        if (!currentTicket) return;
+
+        const formData = new FormData(editForm);
+        let updatedTicket = Object.fromEntries(formData.entries());
+
+// 📌 добавляем обработку issuedAt
+        if (updatedTicket.issuedAtISO) {
+            const d = new Date(updatedTicket.issuedAtISO);
+            const pad = n => n.toString().padStart(2, '0');
+            updatedTicket.issuedAt =
+                `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}, ` +
+                `${pad(d.getHours())}:${pad(d.getMinutes())} Uhr`;
         }
 
-        const fileInput = editForm.qrcodeFile;
-        if(fileInput && fileInput.files.length>0){
+        const fileInput = document.getElementById('qrfile');
+        if (fileInput.files.length > 0) {
             const reader = new FileReader();
-            reader.onload = function(event){
-                updated.qrcode = event.target.result;
-                saveTicket(updated);
-            }
+            reader.onload = async ev => {
+                updatedTicket.qrcode = ev.target.result;
+                await saveTicket(updatedTicket);
+            };
             reader.readAsDataURL(fileInput.files[0]);
         } else {
-            saveTicket(updated);
+            updatedTicket.qrcode = currentTicket.qrcode || '';
+            await saveTicket(updatedTicket);
         }
     });
 
-    function saveTicket(updated){
-        updated.key = currentKey;
-        fetch('/api/tickets', {
-            method: 'POST',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify(updated)
-        }).then(()=>fetchTickets());
+    async function saveTicket(ticketData) {
+        try {
+            const res = await fetch(`/api/tickets/${ticketData.key}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(ticketData)
+            });
+            if (!res.ok) throw new Error('Ошибка при обновлении билета');
+            closeModal();
+            fetchTickets();
+        } catch (err) {
+            alert(err.message);
+            console.error(err);
+        }
     }
-
-    // Поиск
-    const searchInput = document.getElementById('search');
-    function filteredTickets(){
-        const term = searchInput.value.toLowerCase();
-        return tickets.filter(t=> t.fullname.toLowerCase().includes(term) || (t.ticketNumber && t.ticketNumber.includes(term)));
-    }
-    searchInput.addEventListener('input', ()=>renderTable(filteredTickets()));
 
     fetchTickets();
+    function closeModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
 </script>
+
 
 </body>
 </html>

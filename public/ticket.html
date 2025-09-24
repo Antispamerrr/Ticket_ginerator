@@ -7,7 +7,7 @@
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background: #164094; /* исправленный фон */
+            background: #164094;
             display: flex;
             justify-content: center;
             padding: 20px 0;
@@ -29,8 +29,7 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
         .ticket-header {
-        background: linear-gradient(112.91deg,#ffffff82 3.51%,#fff0 111.71%) , #164094;
-            font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", Segoe UI Symbol, sans-serif;;
+            background: linear-gradient(112.91deg,#ffffff82 3.51%,#fff0 111.71%), #164094;
             color: #fff;
             text-align: center;
             padding: 1.5rem;
@@ -59,27 +58,24 @@
             height: 398px;
         }
         .ticket-slider {
-            height: 6px;
-            background: #e0e0e0;
-            margin: 10px 40px;
-            border-radius: 3px;
             position: relative;
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            margin: 20px auto;
+            width: 370px; /* чуть меньше QR-кода */
             overflow: hidden;
         }
-        .ticket-slider::after {
-            content: "";
+
+        .slider-thumb {
             position: absolute;
-            top: 0;
-            left: -40%;
-            width: 40%;
-            height: 100%;
-            background: #2196f3;
-            animation: slide 2s infinite;
-        }
-        @keyframes slide {
-            0% { left: -40%; }
-            50% { left: 100%; }
-            100% { left: -40%; }
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;       /* ширина бегунка */
+            height: 12px;      /* высота бегунка */
+            background-color: #2196f3; /* твой цвет */
+            border-radius: 6px;          /* скруглённые края для ровного вида */
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2); /* лёгкая тень */
         }
         .ticket-number {
             text-align: center;
@@ -94,48 +90,27 @@
             background-color: #f9fafb;
             border-top: 1px solid #ddd;
         }
-        .ticket-details {
-            margin-top: 24px;
+        .ticket-details, .ticket-details2 {
             font-size: 14px;
         }
-        .ticket-details2 {
-            font-size: 14px;
-        }
-        .ticket-details div,
-        .ticket-details2 div {
+        .ticket-details div, .ticket-details2 div {
             padding: 8px 24px;
             display: flex;
             justify-content: space-between;
-            align-items: center; /* ← ключ */
-        }
-        .ticket-details svg,
-        .ticket-details2 svg {
-            width: 18px;
-            height: 18px;
-            margin-right: 8px;
-            flex-shrink: 0;
-            fill: #667085;
+            align-items: center;
         }
         .label {
             display: flex;
-            align-items: center;  /* ← иконка и текст по центру */
-            gap: 8px;             /* расстояние между иконкой и текстом */
+            align-items: center;
+            gap: 8px;
             color: #667085;
             font-weight: 400;
         }
         .label svg {
-            width: 18px;          /* фиксированный размер иконки */
+            width: 18px;
             height: 18px;
-            flex-shrink: 0;       /* не сжимать */
-            display: block;       /* убрать «прыжки» по baseline */
-        }
-        .label .icon {
-            width: 20px;   /* фиксированная ширина под иконку */
-            height: 20px;
-            margin-right: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-shrink: 0;
+            fill: #667085; /* цвет как у текста */
         }
         .info {
             color: rgb(16, 24, 40);
@@ -157,94 +132,84 @@
             max-width: 398px;
             text-align: left;
         }
-             /* Мобильная адаптация на весь экран */
+        /* --- Мобильная адаптация --- */
         @media (max-width: 480px) {
-            html, body {
-                margin: 0;
+            body {
                 padding: 0;
-                width: 100%;
-                height: 100%;
-                overflow-x: hidden;
-                -webkit-text-size-adjust: 100%;
+                background: #164094;
             }
 
             .main-container {
-                width: 100%;
+                width: 100vw;
+                height: 100vh;
                 max-width: 100%;
-                min-height: 100vh; /* контейнер занимает всю высоту экрана */
+                margin: 0;
                 padding: 0;
                 display: flex;
-                flex-direction: column;
+                justify-content: center;
                 align-items: center;
-                justify-content: flex-start;
                 box-sizing: border-box;
             }
 
             .ticket-container {
-                width: 100%;
-                border-radius: 0; /* билет на весь экран */
-                box-shadow: none;
+                width: 95vw;
+                height: 95vh;
+                max-width: 100%;
+                max-height: 100%;
+                border-radius: 16px;
+                padding: 0;
                 display: flex;
                 flex-direction: column;
+                overflow: hidden;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.25);
             }
 
             .ticket-header {
-                font-size: 20px;
-                padding: 1.5rem;
-                text-align: center;
-            }
-
-            .ticket-logos {
-                padding: 16px 0;
+                font-size: 18px;
+                padding: 1rem;
             }
 
             .ticket-logos img {
-                max-width: 25%; /* логотипы меньше на мобильном */
-                height: auto;
-            }
-
-            .ticket-qr {
-                padding: 0;
-                margin: 0;
-                width: 100%;
-                display: flex;
-                justify-content: center;
+                height: 20px;
+                width: auto;
             }
 
             .ticket-qr img {
-                width: 100%; /* QR-код растягивается под ширину экрана */
-                height: auto; /* сохраняем пропорции */
+                width: 80%;
+                height: auto;
+                max-width: 300px;
+            }
+
+            .ticket-slider {
+                width: 80%;
+                height: 10px;
+                margin: 15px auto;
+            }
+
+            .slider-thumb {
+                width: 35px;
+                height: 12px;
             }
 
             .ticket-number {
                 font-size: 1rem;
+                line-height: 1.5rem;
+                margin: 1rem;
                 padding: 8px 0;
-                margin: 1rem 0;
             }
 
-            .ticket-slider {
-                margin: 10px 5%;
-            }
-
-            .ticket-details div,
-            .ticket-details2 div {
-                flex-direction: column; /* текст под иконкой вертикально */
-                align-items: flex-start;
-                padding: 6px 16px;
+            .ticket-details div, .ticket-details2 div {
+                padding: 6px 12px;
+                font-size: 12px;
             }
 
             .small-text {
-                padding: 0 16px 16px 16px;
-                font-size: 12px;
-                text-align: left;
-            }
-
-            /* Плавная вертикальная прокрутка */
-            body, .main-container {
-                overflow-y: auto;
-                -webkit-overflow-scrolling: touch;
+                font-size: 11px;
+                padding: 0 12px 12px 12px;
+                max-width: 90%;
             }
         }
+
     </style>
 </head>
 <body>
@@ -257,54 +222,64 @@
 
         <!-- QR-код -->
         <div class="ticket-qr">
-            <img src="qr.png" alt="QR Code">
+            <img src="qr.png" alt="QR Code" id="qrImg">
         </div>
 
-
-
-
         <!-- Номер билета -->
-        <div class="ticket-number">1058828</div>
+        <div class="ticket-number" id="ticketNumber">1058828</div>
+
         <!-- Бегунок -->
-        <div class="ticket-slider"></div>
+        <div class="ticket-slider" id="ticketSlider">
+            <div class="slider-thumb" id="sliderThumb"></div>
+        </div>
+
         <div class="main-info">
             <div class="ticket-details">
                 <div>
-            <span class="label">
-              <!-- часы -->
-              <svg width="100%" height="100%" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fit="" preserveAspectRatio="xMidYMid meet" focusable="false">
-  <path fill-rule="evenodd" clip-rule="evenodd" d="M10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18ZM11 6C11 5.44772 10.5523 5 10 5C9.44772 5 9 5.44772 9 6V10C9 10.2652 9.10536 10.5196 9.29289 10.7071L12.1213 13.5355C12.5118 13.9261 13.145 13.9261 13.5355 13.5355C13.9261 13.145 13.9261 12.5118 13.5355 12.1213L11 9.58579V6Z"></path>
-</svg>
-              Gültig von:
-            </span>
-                    <span class="info">01.10.2025 - 00:00</span>
+                    <span class="label">
+                        <!-- часы -->
+                        <svg viewBox="0 0 20 20"><path fill-rule="evenodd" clip-rule="evenodd" d="M10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18ZM11 6C11 5.44772 10.5523 5 10 5C9.44772 5 9 5.44772 9 6V10C9 10.2652 9.10536 10.5196 9.29289 10.7071L12.1213 13.5355C12.5118 13.9261 13.145 13.9261 13.5355 13.5355C13.9261 13.145 13.9261 12.5118 13.5355 12.1213L11 9.58579V6Z"/></svg>
+                        Gültig von:
+                    </span>
+                    <span class="info" id="validFrom">01.10.2025 - 00:00</span>
                 </div>
                 <div>
-                    <span class="label"><span class="icon"></span> <!-- пустое место под иконку -->Gültig bis:</span>
-                    <span class="info">01.11.2025 - 03:00</span>
+                    <span class="label">
+                        <svg></svg>
+                        Gültig bis:
+                    </span>
+                    <span class="info" id="validUntil">01.11.2025 - 03:00</span>
                 </div>
                 <div>
-                    <span class="label"><span class="icon"></span> <!-- пустое место под иконку -->Ausgestellt:</span>
-                    <span class="info">22.09.2025, 22:54 Uhr</span>
+                    <span class="label">
+                        <svg></svg>
+                        Ausgestellt:
+                    </span>
+                    <span class="info" id="issuedAt">22.09.2025, 22:54 Uhr</span>
                 </div>
                 <div>
-                    <span class="label"><span class="icon"></span> <!-- пустое место под иконку -->Geltungsbereich:</span>
-                    <span class="info">Deutschlandweit</span>
+                    <span class="label">
+                        <svg></svg>
+                        Geltungsbereich:
+                    </span>
+                    <span class="info" id="region">Deutschlandweit</span>
                 </div>
                 <div>
-                    <span class="label"><span class="icon"></span> <!-- пустое место под иконку -->Klasse:</span>
-                    <span class="info">2. Klasse</span>
+                    <span class="label">
+                        <svg></svg>
+                        Klasse:
+                    </span>
+                    <span class="info" id="class">2. Klasse</span>
                 </div>
                 <div>
-            <span class="label">
-              <!-- билет -->
-              <svg width="100%" height="100%" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fit="" preserveAspectRatio="xMidYMid meet" focusable="false">
+                    <span class="label">
+                        <svg width="100%" height="100%" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fit="" preserveAspectRatio="xMidYMid meet" focusable="false">
   <path d="M14 5.5C14 7.36384 12.7252 8.92994 11 9.37398V13C11 13.5523 10.5523 14 10 14C9.44771 14 9 13.5523 9 13V9.37398C7.27477 8.92994 6 7.36384 6 5.5C6 3.29086 7.79086 1.5 10 1.5C12.2091 1.5 14 3.29086 14 5.5Z"></path>
   <path d="M1.5 14.5C1.5 12.7003 4.02566 11.1782 7.5 10.6758V13C7.5 14.3807 8.61929 15.5 10 15.5C11.3807 15.5 12.5 14.3807 12.5 13V10.6758C15.9743 11.1782 18.5 12.7003 18.5 14.5C18.5 16.7091 14.6944 18.5 10 18.5C5.30558 18.5 1.5 16.7091 1.5 14.5Z"></path>
 </svg>
-              Preisstufe:
-            </span>
-                    <span class="info">deutschlandweit</span>
+                        Preisstufe:
+                    </span>
+                    <span class="info" id="priceLevel">deutschlandweit</span>
                 </div>
             </div>
 
@@ -312,25 +287,18 @@
 
             <div class="ticket-details2">
                 <div>
-            <span class="label">
-              <!-- человек -->
-              <svg width="100%" height="100%" viewBox="0 0 14 16" xmlns="http://www.w3.org/2000/svg" fit="" preserveAspectRatio="xMidYMid meet" focusable="false">
-<path d="M7 7C8.933 7 10.5 5.433 10.5 3.5C10.5 1.567 8.933 0 7 0C5.067 0 3.5 1.567 3.5 3.5C3.5 5.433 5.067 7 7 7Z"></path>
-<path d="M5.15 8.62627C4.25072 8.26964 3.20665 8.03441 2.42 8.5975C0.933754 9.66135 0 11.2012 0 13.3333C0 14.8061 1.19724 16 2.67 16H11.34C12.8128 16 14 14.8061 14 13.3333C14 11.2012 13.0662 9.66134 11.58 8.59749C10.7934 8.03441 9.75928 8.26964 8.86 8.62627C8.25186 8.86744 7.6951 9 7.0011 9C6.3071 9 5.75814 8.86744 5.15 8.62627Z"></path>
-</svg>
-              Ticketinhaber*in:
-            </span>
-                    <span class="info">Dima Neonov</span>
+                    <span class="label">
+                        <svg viewBox="0 0 14 16"><path d="M7 7C8.933 7 10.5 5.433 10.5 3.5C10.5 1.567 8.933 0 7 0C5.067 0 3.5 1.567 3.5 3.5C3.5 5.433 5.067 7 7 7z"/><path d="M5.15 8.62627C4.25072 8.26964 3.20665 8.03441 2.42 8.5975C0.933754 9.66135 0 11.2012 0 13.3333C0 14.8061 1.19724 16 2.67 16H11.34C12.8128 16 14 14.8061 14 13.3333C14 11.2012 13.0662 9.66134 11.58 8.59749C10.7934 8.03441 9.75928 8.26964 8.86 8.62627C8.25186 8.86744 7.6951 9 7.0011 9C6.3071 9 5.75814 8.86744 5.15 8.62627Z"/></svg>
+                        Ticketinhaber*in:
+                    </span>
+                    <span class="info" id="fullname">Dima Neonov</span>
                 </div>
                 <div>
-            <span class="label">
-              <!-- календарь -->
-               <svg width="100%" height="100%" viewBox="0 0 16 17" xmlns="http://www.w3.org/2000/svg" fit="" preserveAspectRatio="xMidYMid meet" focusable="false">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M3 1C3 0.447715 3.44772 0 4 0C4.55228 0 5 0.447715 5 1H11C11 0.447715 11.4477 0 12 0C12.5523 0 13 0.447715 13 1C14.6569 1 16 2.34315 16 4V14C16 15.6569 14.6569 17 13 17H3C1.34315 17 0 15.6569 0 14V4C0 2.34315 1.34315 1 3 1ZM3 3C2.44772 3 2 3.44772 2 4V6H14V4C14 3.44772 13.5523 3 13 3H3ZM9.00002 9C9.00002 8.7234 8.84778 8.46926 8.60391 8.33875C8.36004 8.20823 8.06414 8.22254 7.83399 8.37596L6.33399 9.37596C5.98935 9.60573 5.89622 10.0714 6.12598 10.416C6.35575 10.7607 6.8214 10.8538 7.16604 10.624L7.50002 10.4014V14C7.50002 14.4142 7.8358 14.75 8.25002 14.75C8.66423 14.75 9.00002 14.4142 9.00002 14V9Z"></path>
-</svg>
-              Geburtsdatum:
-            </span>
-                    <span class="info">12.11.1992</span>
+                    <span class="label">
+                        <svg viewBox="0 0 16 17"><path fill-rule="evenodd" clip-rule="evenodd" d="M3 1C3 0.447715 3.44772 0 4 0C4.55228 0 5 0.447715 5 1H11C11 0.447715 11.4477 0 12 0C12.5523 0 13 0.447715 13 1C14.6569 1 16 2.34315 16 4V14C16 15.6569 14.6569 17 13 17H3C1.34315 17 0 15.6569 0 14V4C0 2.34315 1.34315 1 3 1ZM3 3C2.44772 3 2 3.44772 2 4V6H14V4C14 3.44772 13.5523 3 13 3H3ZM9.00002 9C9.00002 8.7234 8.84778 8.46926 8.60391 8.33875C8.36004 8.20823 8.06414 8.22254 7.83399 8.37596L6.33399 9.37596C5.98935 9.60573 5.89622 10.0714 6.12598 10.416C6.35575 10.7607 6.8214 10.8538 7.16604 10.624L7.50002 10.4014V14C7.50002 14.4142 7.8358 14.75 8.25002 14.75C8.66423 14.75 9.00002 14.4142 9.00002 14V9Z"/></svg>
+                        Geburtsdatum:
+                    </span>
+                    <span class="info" id="birthdate">12.11.1992</span>
                 </div>
                 <div class="border-bottom_double"></div>
             </div>
@@ -341,72 +309,59 @@
         </div>
     </div>
 </div>
-</body>
-</html>
 
 <script>
-    // Получаем ключ билета из URL
-    const params = new URLSearchParams(location.search);
-    const key = params.get('key');
-
-    if(!key){
-        alert('Билет не найден!');
-    }
-
-    // Элементы
-    const qrcodeEl = document.getElementById('qrcode');
-    const fullnameEl = document.getElementById('fullname');
-    const birthdateEl = document.getElementById('birthdate');
-    const departureDateEl = document.getElementById('departureDate');
-    const departureTimeEl = document.getElementById('departureTime');
-    const arrivalDateEl = document.getElementById('arrivalDate');
-    const arrivalTimeEl = document.getElementById('arrivalTime');
-    const placeEl = document.getElementById('place');
-    const classEl = document.getElementById('class');
-    const ticketNumberEl = document.getElementById('ticketNumber');
-
-    // Прогресс-бегунок
-    const ball = document.getElementById('progressBall');
-    const bar = ball.parentElement;
-    let pos = 0, speed = 2, direction = 1;
-    function animate() {
-        const maxPos = bar.clientWidth - ball.clientWidth;
-        pos += speed * direction;
-        if(pos >= maxPos){ pos = maxPos; direction = -1; }
-        else if(pos <= 0){ pos = 0; direction = 1; }
-        ball.style.left = pos + 'px';
-        requestAnimationFrame(animate);
-    }
-    animate();
-
-    // Загружаем данные с сервера
-    fetch(`/api/tickets/${key}`)
-        .then(res => {
-            if(!res.ok) throw new Error('Ticket not found');
-            return res.json();
-        })
-        .then(ticket => {
-            qrcodeEl.src = ticket.qrcode || '';
-            fullnameEl.textContent = ticket.fullname || '-';
-            birthdateEl.textContent = ticket.birthdate || '-';
-
-            const [depDate, depTime] = (ticket.departure || '- - -').split(' - ');
-            const [arrDate, arrTime] = (ticket.arrival || '- - -').split(' - ');
-
-            departureDateEl.textContent = depDate;
-            departureTimeEl.textContent = depTime;
-            arrivalDateEl.textContent = arrDate;
-            arrivalTimeEl.textContent = arrTime;
-
-            placeEl.textContent = ticket.place || '-';
-            classEl.textContent = ticket.class || '-';
-            ticketNumberEl.textContent = ticket.ticketNumber ? `Билет № ${ticket.ticketNumber}` : '';
-        })
-        .catch(err => {
-            alert('Билет не найден на сервере!');
-            console.error(err);
-        });
+    (async function(){
+        const params = new URLSearchParams(window.location.search);
+        const key = params.get('key');
+        if(!key){alert('Ключ билета не найден'); return;}
+        function parseDateString(str){
+            if(!str) return null;
+            let datePart='', timePart='';
+            if(str.includes(' - ')){[datePart,timePart]=str.split(' - ');}
+            else if(str.includes(', ')){[datePart,timePart]=str.split(', '); timePart=timePart.replace(' Uhr','');}
+            else return new Date(str);
+            const [day,month,year]=datePart.split('.').map(Number);
+            const [hours,minutes]=timePart.split(':').map(Number);
+            return new Date(year,month-1,day,hours,minutes);
+        }
+        function formatDateTime(dt){
+            const d=dt instanceof Date?dt:parseDateString(dt);
+            const pad=n=>n.toString().padStart(2,'0');
+            return `${pad(d.getDate())}.${pad(d.getMonth()+1)}.${d.getFullYear()} - ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+        function formatIssued(dt){
+            const d=dt instanceof Date?dt:parseDateString(dt);
+            const pad=n=>n.toString().padStart(2,'0');
+            return `${pad(d.getDate())}.${pad(d.getMonth()+1)}.${d.getFullYear()}, ${pad(d.getHours())}:${pad(d.getMinutes())} Uhr`;
+        }
+        try{
+            const res=await fetch('/api/tickets');
+            if(!res.ok) throw new Error('Не удалось получить билеты с сервера');
+            const tickets=await res.json();
+            const ticket=tickets.find(t=>t.key===key);
+            if(!ticket){alert('Билет с таким ключом не найден'); return;}
+            const setText=(id,value)=>{const el=document.getElementById(id); if(el) el.textContent=value||'';}
+            const setSrc=(id,value)=>{const el=document.getElementById(id); if(el) el.src=value||'';}
+            setText('ticketNumber',ticket.ticketNumber);
+            setSrc('qrImg',ticket.qrcode);
+            setText('validFrom',formatDateTime(ticket.validFrom));
+            setText('validUntil',formatDateTime(ticket.validUntil));
+            setText('issuedAt',formatIssued(ticket.issuedAt));
+            setText('region',ticket.region);
+            setText('class',ticket.class);
+            setText('priceLevel',ticket.priceLevel);
+            setText('fullname',ticket.fullname);
+            setText('birthdate',ticket.birthdate);
+        }catch(err){console.error(err); alert(err.message);}
+// бегунок
+        const thumb=document.getElementById('sliderThumb');
+        const slider=thumb.parentElement;
+        let pos=0, direction=1, speed=2;
+        function animate(){const maxPos=slider.clientWidth-thumb.clientWidth; pos+=speed*direction; if(pos<=0){pos=0; direction=1;} if(pos>=maxPos){pos=maxPos; direction=-1;} thumb.style.left=pos+'px'; requestAnimationFrame(animate);}
+        animate();
+    })();
 </script>
-
 </body>
 </html>
+
