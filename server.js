@@ -6,6 +6,9 @@ const session = require('express-session'); // <--- добавляем
 const app = express();
 const PORT = 3000;
 
+app.get('/', (req, res) => {
+    res.redirect('/login.html');
+});
 // Папка public для HTML/CSS/JS
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json({ limit: '10mb' })); // поддержка больших QR-кодов
