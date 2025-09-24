@@ -1,5 +1,5 @@
 {
-  "name": "сайт-шаблон",
+  "name": "Site",
   "version": "1.0.0",
   "description": "",
   "main": "script.js",
@@ -9,6 +9,7 @@
   "private": true,
   "dependencies": {
     "body-parser": "^2.2.0",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "express-session": "^1.18.2"
   }
 }
