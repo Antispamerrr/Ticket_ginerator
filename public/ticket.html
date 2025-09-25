@@ -10,9 +10,9 @@
             background: #164094;
             display: flex;
             justify-content: center;
-            align-items: center;
-            min-height: 100vh; /* Занимает всю высоту экрана */
-            padding: 0; /* Убраны отступы для мобильного вида */
+            align-items: flex-start; /* Изменено с center на flex-start для мобильных */
+            min-height: 100vh;
+            padding: 0;
         }
 
         .main-container {
@@ -21,7 +21,7 @@
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            min-height: 100vh; /* Контейнер растягивается на всю высоту */
+            min-height: 100vh;
         }
 
         .ticket-container {
@@ -30,7 +30,7 @@
             max-width: 100%;
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            flex: 1; /* Растягивает билет на доступное пространство */
+            flex: 1;
             display: flex;
             flex-direction: column;
         }
@@ -41,7 +41,7 @@
             text-align: center;
             padding: 1.5rem;
             font-weight: bold;
-            font-size: 1.5rem; /* Относительный размер шрифта */
+            font-size: 1.5rem;
         }
 
         .ticket-logos {
@@ -53,7 +53,7 @@
         }
 
         .ticket-logos img {
-            height: 1.5rem; /* Относительный размер */
+            height: 1.5rem;
             width: auto;
         }
 
@@ -66,9 +66,9 @@
 
         .ticket-qr img {
             width: 100%;
-            max-width: 250px; /* Ограничение размера QR-кода */
+            max-width: 398px;
             height: auto;
-            aspect-ratio: 1/1; /* Сохраняем пропорции */
+            aspect-ratio: 1/1;
         }
 
         .ticket-slider {
@@ -77,8 +77,8 @@
             background: #e0e0e0;
             border-radius: 5px;
             margin: 1.25rem auto;
-            width: 90%; /* Относительная ширина */
-            max-width: 350px; /* Ограничение для больших экранов */
+            width: 90%;
+            max-width: 350px;
             overflow: hidden;
         }
 
@@ -91,6 +91,8 @@
             background-color: #2196f3;
             border-radius: 6px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            left: 0;
+            transition: left 0.02s linear;
         }
 
         .ticket-number {
@@ -106,11 +108,12 @@
         .main-info {
             background-color: #f9fafb;
             border-top: 1px solid #ddd;
-            flex: 1; /* Растягивает секцию на оставшееся пространство */
+            flex: 1;
+            overflow-y: auto; /* Разрешаем прокрутку только внутри .main-info */
         }
 
         .ticket-details, .ticket-details2 {
-            font-size: 0.875rem; /* Уменьшенный шрифт для мобильных */
+            font-size: 0.875rem;
         }
 
         .ticket-details div, .ticket-details2 div {
@@ -158,33 +161,40 @@
             text-align: left;
         }
 
-        /* Медиа-запросы для мобильных устройств */
         @media (max-width: 600px) {
+            body {
+                align-items: stretch; /* Растягиваем на всю высоту */
+                height: 100vh; /* Фиксируем высоту body */
+                overflow: hidden; /* Убираем прокрутку body */
+            }
+
             .main-container {
-                padding: 0; /* Убираем отступы */
+                padding: 0;
+                height: 100vh; /* Полная высота экрана */
             }
 
             .ticket-container {
-                border-radius: 0; /* Убираем скругления для нативного вида */
-                box-shadow: none; /* Убираем тень */
-                min-height: 100vh; /* Полная высота экрана */
+                border-radius: 0;
+                box-shadow: none;
+                height: 100%; /* Занимаем всю высоту родителя */
+                min-height: unset; /* Убираем min-height */
             }
 
             .ticket-header {
-                font-size: 1.25rem; /* Меньший шрифт */
+                font-size: 1.25rem;
                 padding: 1rem;
             }
 
             .ticket-logos img {
-                height: 1.2rem; /* Уменьшаем логотип */
+                height: 1.2rem;
             }
 
             .ticket-qr img {
-                max-width: 200px; /* Еще меньший QR-код */
+                max-width: 200px;
             }
 
             .ticket-slider {
-                width: 85%; /* Уменьшаем ширину бегунка */
+                width: 85%;
                 max-width: 300px;
             }
 
@@ -192,8 +202,9 @@
                 font-size: 1rem;
                 margin: 0.75rem;
             }
+
             .ticket-details, .ticket-details2 {
-                font-size: 0.75rem; /* Меньший шрифт для деталей */
+                font-size: 0.75rem;
             }
 
             .ticket-details div, .ticket-details2 div {
