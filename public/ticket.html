@@ -112,6 +112,9 @@
         .main-info {
             background-color: #f9fafb;
             border-top: 1px solid #ddd;
+            min-height: 0;
+            overflow-y: auto; /* Прокрутка только внутри, если содержимое превышает */
+            /*
             flex: 1; /* Растягивает секцию на оставшееся пространство */
         }
 
@@ -167,18 +170,19 @@
             body {
                 align-items: stretch;
                 min-height: 100vh;
-                height: auto;
-                overflow-y: auto;
+                height: 100dvh;
+                overflow: hidden;
             }
 
             .main-container {
                 padding: 20px 10px; /* Убираем padding для мобильной версии */
-                height: 100vh;
+                height: 100dvh;
+                max-width: none;
             }
 
             .ticket-container {
-                height: auto; /* Занимаем всю высоту */
-                min-height: auto; /* Убираем min-height */
+                height: 100%; /* Занимаем всю высоту */
+                min-height: 0; /* Убираем min-height */
             }
 
             .ticket-header {
