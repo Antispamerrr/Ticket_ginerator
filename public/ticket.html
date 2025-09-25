@@ -14,9 +14,9 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #164094;
             display: flex;
-
+overflow-y: auto;
             justify-content: center;
-            align-items: center;
+            align-items: stretch;
             min-height: 100dvh; /* better than 100vh on mobile */ /* Занимает всю высоту экрана */
             padding: 20px 0; /* Убраны отступы для мобильного вида */
         }
@@ -27,7 +27,8 @@
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            min-height: auto;
+            min-height: 0;          /* critical in flex parents */
+            padding-bottom: 10px;
             /*min-height: 0;*/
             /*min-height: 100vh; !* Контейнер растягивается на всю высоту *!*/
         }
@@ -35,7 +36,7 @@
         .ticket-container {
             background: #fff;
             border-radius: 16px;
-            max-width: 100%;
+            /*max-width: 100%;*/
             overflow: hidden;
             /*overflow: visible;*/
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -43,6 +44,7 @@
             display: flex;
             flex-direction: column;
             min-height: 0;
+            margin-bottom: 10px;
         }
 
         .ticket-header {
@@ -172,13 +174,13 @@
                 display: block;
                 /*align-items: stretch;*/
                 min-height: 100dvh;
-                height: auto;
+                /*height: auto;*/
                 overflow-y: auto;
             }
 
             .main-container {
                 padding: 20px 10px; /* Убираем padding для мобильной версии */
-                height: 100vh;
+                height: auto;
                 min-height: 0;
             }
 
