@@ -27,18 +27,22 @@
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            min-height: 100vh; /* Контейнер растягивается на всю высоту */
+            min-height: auto;
+            /*min-height: 0;*/
+            /*min-height: 100vh; !* Контейнер растягивается на всю высоту *!*/
         }
 
         .ticket-container {
             background: #fff;
             border-radius: 16px;
             max-width: 100%;
-            overflow: hidden;
+            /*overflow: hidden;*/
+            overflow: visible;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            flex: 1; /* Растягивает билет на доступное пространство */
+            flex: 1 1 auto; /* Растягивает билет на доступное пространство */
             display: flex;
             flex-direction: column;
+            min-height: 0;
         }
 
         .ticket-header {
@@ -165,8 +169,9 @@
         }
         @media (max-width: 600px) {
             body {
-                align-items: stretch;
-                min-height: 100vh;
+                display: block;
+                /*align-items: stretch;*/
+                min-height: 100dvh;
                 height: auto;
                 overflow-y: auto;
             }
