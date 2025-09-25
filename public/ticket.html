@@ -67,7 +67,7 @@
 
         .ticket-qr img {
             width: 100%;
-            max-width: 250px; /* Ограничение размера QR-кода */
+            max-width: 398px; /* Ограничение размера QR-кода */
             height: auto;
             aspect-ratio: 1/1; /* Сохраняем пропорции */
         }
@@ -159,53 +159,6 @@
             text-align: left;
         }
 
-        /* Медиа-запросы для мобильных устройств */
-        @media (max-width: 600px) {
-            .main-container {
-                padding: 0; /* Убираем отступы */
-            }
-
-            .ticket-container {
-                border-radius: 0; /* Убираем скругления для нативного вида */
-                box-shadow: none; /* Убираем тень */
-                min-height: 100vh; /* Полная высота экрана */
-            }
-
-            .ticket-header {
-                font-size: 1.25rem; /* Меньший шрифт */
-                padding: 1rem;
-            }
-
-            .ticket-logos img {
-                height: 1.2rem; /* Уменьшаем логотип */
-            }
-
-            .ticket-qr img {
-                max-width: 200px; /* Еще меньший QR-код */
-            }
-
-            .ticket-slider {
-                width: 85%; /* Уменьшаем ширину бегунка */
-                max-width: 300px;
-            }
-
-            .ticket-number {
-                font-size: 1rem;
-                margin: 0.75rem;
-            }
-            .ticket-details, .ticket-details2 {
-                font-size: 0.75rem; /* Меньший шрифт для деталей */
-            }
-
-            .ticket-details div, .ticket-details2 div {
-                padding: 0.5rem 1rem;
-            }
-
-            .small-text {
-                font-size: 0.7rem;
-                padding: 0 1rem 1rem;
-            }
-        }
     </style>
 </head>
 <body>
