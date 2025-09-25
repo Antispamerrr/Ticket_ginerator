@@ -2,8 +2,13 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Deutschlandticket</title>
     <style>
+        html {
+            box-sizing: border-box;
+            -webkit-text-size-adjust: 100%;
+        }
         body {
             margin: 0;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -12,7 +17,7 @@
 
             justify-content: center;
             align-items: center;
-            min-height: 100vh; /* Занимает всю высоту экрана */
+            min-height: 100dvh; /* better than 100vh on mobile */ /* Занимает всю высоту экрана */
             padding: 20px 0; /* Убраны отступы для мобильного вида */
         }
 
@@ -158,6 +163,70 @@
             padding: 0 1.5rem 1.5rem;
             text-align: left;
         }
+        @media (max-width: 600px) {
+            body {
+                align-items: stretch;
+                height: 100vh;
+                overflow: hidden;
+            }
+
+            .main-container {
+                padding: 0; /* Убираем padding для мобильной версии */
+                height: 100vh;
+            }
+
+            .ticket-container {
+                border-radius: 0;
+                box-shadow: none;
+                height: 100%; /* Занимаем всю высоту */
+                min-height: unset; /* Убираем min-height */
+            }
+
+            .ticket-header {
+                font-size: 1.25rem;
+                padding: 1rem;
+            }
+
+            .ticket-logos img {
+                height: 1.2rem;
+            }
+
+            .ticket-qr img {
+                max-width: 200px;
+            }
+
+            .ticket-slider {
+                width: 85%;
+                max-width: 300px;
+            }
+
+            .ticket-number {
+                font-size: 1rem;
+                margin: 0.75rem;
+            }
+
+            .ticket-details, .ticket-details2 {
+                font-size: 0.75rem;
+            }
+
+            .ticket-details div, .ticket-details2 div {
+                padding: 0.5rem 1rem;
+            }
+
+            .small-text {
+                font-size: 0.7rem;
+                padding: 0 1rem 1rem;
+            }
+        }
+        @media (max-width: 400px) {
+            .ticket-logos { padding-top: 0.5rem; margin-bottom: 0.5rem; }
+            .ticket-logos img { height: 1.25rem; }
+
+            .ticket-qr { padding: 0.75rem; }
+            .small-text { font-size: 0.75rem; padding: 0 1rem 1rem; }
+            .border-bottom { margin: 1rem 0; }
+        }
+
 
     </style>
 </head>
