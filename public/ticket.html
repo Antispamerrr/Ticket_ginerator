@@ -166,20 +166,19 @@
         @media (max-width: 600px) {
             body {
                 align-items: stretch;
-                height: 100vh;
-                overflow: hidden;
+                min-height: 100vh;
+                height: auto;
+                overflow-y: auto;
             }
 
             .main-container {
-                padding: 0; /* Убираем padding для мобильной версии */
+                padding: 20px 10px; /* Убираем padding для мобильной версии */
                 height: 100vh;
             }
 
             .ticket-container {
-                border-radius: 0;
-                box-shadow: none;
-                height: 100%; /* Занимаем всю высоту */
-                min-height: unset; /* Убираем min-height */
+                height: auto; /* Занимаем всю высоту */
+                min-height: auto; /* Убираем min-height */
             }
 
             .ticket-header {
