@@ -48,8 +48,6 @@
         <th>Начало действия</th>
         <th>Окончание действия</th>
         <th>Выдан</th>
-        <th>Место действия</th>
-        <th>Класс</th>
         <th>Редактировать</th>
         <th>Ссылка</th>
     </tr>
@@ -64,13 +62,10 @@
         <form id="editForm">
             <input type="hidden" name="key">
             <label>Имя: <input type="text" name="fullname" required></label>
-            <label>Дата рождения: <input type="date" name="birthdate" required></label>
-            <label>Начало действия: <input type="datetime-local" name="validFromISO" required></label>
-            <label>Окончание действия: <input type="datetime-local" name="validUntilISO" required></label>
-            <label>Дата выдачи (Ausgestellt): <input type="datetime-local" name="issuedAtISO" required></label>
-            <label>Место: <input type="text" name="region" required></label>
-            <label>Класс: <input type="text" name="class" required></label>
-            <label>Preisstufe: <input type="text" name="priceLevel" required></label>
+            <label>Дата рождения: <input type="text" name="birthdate" placeholder="DD.MM.YYYY" required></label>
+            <label>Начало действия (только месяц менять): <input type="month" name="validFromISO" required></label>
+            <label>Окончание действия (только месяц менять): <input type="month" name="validUntilISO" required></label>
+            <label>Дата выдачи (Ausgestellt): <input type="text" name="issuedAtISO" placeholder="DD.MM.YYYY, HH:MM Uhr" required></label>
             <label>Номер билета: <input type="text" name="ticketNumber" required></label>
             <label>QR-код (новый, если нужно заменить):
                 <input type="file" id="qrfile" accept="image/*">
@@ -88,6 +83,28 @@
     let ticketsList = [];
     let currentTicket = null;
 
+    // Форматирование для таблицы
+    const formatDisplay = iso => {
+        if (!iso) return '';
+        const d = new Date(iso);
+        const pad = n => String(n).padStart(2,'0');
+        return `${pad(d.getDate())}.${pad(d.getMonth()+1)}.${d.getFullYear()}, ${pad(d.getHours())}:${pad(d.getMinutes())} Uhr`;
+    };
+
+    // Сохраняем день, часы, минуты при изменении месяца
+    function preserveTime(oldISO, newMonthISO) {
+        if (!oldISO) return newMonthISO + "-01T00:00"; // fallback
+        const oldDate = new Date(oldISO);
+        const [year, month] = newMonthISO.split('-');
+        return new Date(
+            Number(year),
+            Number(month)-1,
+            oldDate.getDate(),
+            oldDate.getHours(),
+            oldDate.getMinutes()
+        ).toISOString();
+    }
+
     async function fetchTickets() {
         const res = await fetch('/api/tickets');
         ticketsList = await res.json();
@@ -100,18 +117,15 @@
         tickets.forEach(ticket => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-      <td>${ticket.ticketNumber}</td>
-      <td>${ticket.fullname}</td>
-      <td>${ticket.birthdate}</td>
-      <td>${ticket.validFrom}</td>
-      <td>${ticket.validUntil}</td>
-      <td>${ticket.issuedAt}</td>
-      <td>${ticket.region}</td>
-      <td>${ticket.class}</td>
-<td>${ticket.priceLevel}</td>
-      <td><button data-key="${ticket.key}">Редактировать</button></td>
-      <td><a href="ticket.html?key=${ticket.key}" target="_blank">Открыть</a></td>
-    `;
+            <td>${ticket.ticketNumber}</td>
+            <td>${ticket.fullname}</td>
+            <td>${ticket.birthdate}</td>
+            <td>${ticket.validFromISO ? formatDisplay(ticket.validFromISO) : ''}</td>
+            <td>${ticket.validUntilISO ? formatDisplay(ticket.validUntilISO) : ''}</td>
+            <td>${ticket.issuedAtISO || ticket.issuedAt}</td>
+            <td><button data-key="${ticket.key}">Редактировать</button></td>
+            <td><a href="ticket.html?key=${ticket.key}" target="_blank">Открыть</a></td>
+        `;
             tableBody.appendChild(tr);
         });
 
@@ -127,12 +141,9 @@
         editForm.key.value = currentTicket.key;
         editForm.fullname.value = currentTicket.fullname;
         editForm.birthdate.value = currentTicket.birthdate;
-        editForm.validFromISO.value = currentTicket.validFromISO || '';
-        editForm.validUntilISO.value = currentTicket.validUntilISO || '';
-        editForm.issuedAtISO.value = currentTicket.issuedAtISO || '';
-        editForm.region.value = currentTicket.region || '';
-        editForm.priceLevel.value = currentTicket.priceLevel || '';
-        editForm.class.value = currentTicket.class || '';
+        editForm.validFromISO.value = currentTicket.validFromISO ? currentTicket.validFromISO.slice(0,7) : '';
+        editForm.validUntilISO.value = currentTicket.validUntilISO ? currentTicket.validUntilISO.slice(0,7) : '';
+        editForm.issuedAtISO.value = currentTicket.issuedAtISO || currentTicket.issuedAt || '';
         editForm.ticketNumber.value = currentTicket.ticketNumber;
         qrPreview.src = currentTicket.qrcode || '';
 
@@ -146,15 +157,14 @@
         const formData = new FormData(editForm);
         let updatedTicket = Object.fromEntries(formData.entries());
 
-// 📌 добавляем обработку issuedAt
-        if (updatedTicket.issuedAtISO) {
-            const d = new Date(updatedTicket.issuedAtISO);
-            const pad = n => n.toString().padStart(2, '0');
-            updatedTicket.issuedAt =
-                `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}, ` +
-                `${pad(d.getHours())}:${pad(d.getMinutes())} Uhr`;
-        }
+        // Обработка дат validFrom и validUntil — сохраняем день и время
+        updatedTicket.validFromISO = preserveTime(currentTicket.validFromISO, updatedTicket.validFromISO);
+        updatedTicket.validUntilISO = preserveTime(currentTicket.validUntilISO, updatedTicket.validUntilISO);
 
+        // Обработка даты выдачи
+        updatedTicket.issuedAt = updatedTicket.issuedAtISO;
+
+        // Обработка QR-кода
         const fileInput = document.getElementById('qrfile');
         if (fileInput.files.length > 0) {
             const reader = new FileReader();
@@ -186,11 +196,11 @@
     }
 
     fetchTickets();
+
     function closeModal() {
         document.getElementById('editModal').style.display = 'none';
     }
 </script>
-
 
 </body>
 </html>
