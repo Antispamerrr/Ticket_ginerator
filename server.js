@@ -70,7 +70,7 @@ app.get('/api/tickets', requireAuth, (req, res) => {
     res.json(readTickets());
 });
 
-app.get('/api/tickets/:key', requireAuth, (req, res) => {
+app.get('/api/tickets/:key', (req, res) => {
     const tickets = readTickets();
     const ticket = tickets.find(t => t.key === req.params.key);
     if (ticket) res.json(ticket);

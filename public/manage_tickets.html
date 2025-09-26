@@ -66,7 +66,7 @@
             <label>Начало действия (только месяц менять): <input type="month" name="validFromISO" required></label>
             <label>Окончание действия (только месяц менять): <input type="month" name="validUntilISO" required></label>
             <label>Дата выдачи (Ausgestellt): <input type="text" name="issuedAtISO" placeholder="DD.MM.YYYY, HH:MM Uhr" required></label>
-            <label>Номер билета: <input type="text" name="ticketNumber" required></label>
+            <label>Номер билета: <input type="text" name="ticketNumber" readonly></label>
             <label>QR-код (новый, если нужно заменить):
                 <input type="file" id="qrfile" accept="image/*">
             </label>
@@ -163,7 +163,7 @@
 
         // Обработка даты выдачи
         updatedTicket.issuedAt = updatedTicket.issuedAtISO;
-
+        updatedTicket.ticketNumber = currentTicket.ticketNumber;
         // Обработка QR-кода
         const fileInput = document.getElementById('qrfile');
         if (fileInput.files.length > 0) {
