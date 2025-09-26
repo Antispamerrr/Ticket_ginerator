@@ -66,7 +66,7 @@ function writeTickets(tickets) {
 }
 
 // Доступ к API только для авторизованных
-app.get('/api/tickets', requireAuth, (req, res) => {
+app.get('/api/tickets', (req, res) => {
     res.json(readTickets());
 });
 
