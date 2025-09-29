@@ -60,8 +60,8 @@
         .ticket-qr {
             display: flex;
             justify-content: center;
-            padding: 1.25rem;
-            border-bottom: 1px solid #ddd;
+            padding: 24px;
+            box-sizing: border-box;
         }
         .ticket-qr img {
             width: 100%;
@@ -116,12 +116,12 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            color: #667085;
+            color: rgb(102, 112, 133);
             font-weight: 400;
         }
         .label svg {
-            width: 1.125rem;
-            height: 1.125rem;
+            width: 25px;
+            height: 16px;
             flex-shrink: 0;
             fill: #667085;
         }
@@ -149,9 +149,10 @@
                 display: block;
                 min-height: 100dvh;
                 overflow-y: auto;
+                margin: 0;
             }
             .main-container {
-                padding: 20px 10px;
+                padding: 17px 16px;
                 height: auto;
                 min-height: 0;
             }
@@ -161,18 +162,39 @@
             }
             .ticket-header {
                 font-size: 1.25rem;
-                padding: 1rem;
+                font-weight: 600;
+                line-height: 1.75rem;
+                padding: 24px;
+                border: 1px solid #ffffff9c;
+                box-sizing: border-box;
+                border-top-left-radius: 1rem;
+                border-top-right-radius: 1rem;
+            }
+            .ticket-logos {
+                padding-top: 24px;
             }
             .ticket-logos img {
-                height: 1.2rem;
+                height: 24px;
+                width: 37px;
             }
             .ticket-slider {
                 width: 85%;
                 max-width: 300px;
             }
+
+            .ticket-qr img {
+                width: 100%;
+                max-width: 343px;
+                height: auto;
+                aspect-ratio: 1/1;
+            }
             .ticket-number {
-                font-size: 1rem;
-                margin: 0.75rem;
+                font-size: 1.25rem;
+                line-height: 1.75rem;
+                padding: 16px;
+                border: 1px solid #ddd;
+                border-radius: 0.5rem;
+                margin: 0 24px 24px;
             }
             .ticket-details, .ticket-details2 {
                 font-size: 0.75rem;
@@ -183,14 +205,65 @@
             .small-text {
                 font-size: 0.7rem;
                 padding: 0 1rem 1rem;
+                border-top: 1px solid #ddd;
             }
         }
         @media (max-width: 400px) {
-            .ticket-logos { padding-top: 0.5rem; margin-bottom: 0.5rem; }
-            .ticket-logos img { height: 1.25rem; }
-            .ticket-qr { padding: 0.75rem; }
-            .small-text { font-size: 0.75rem; padding: 0 1rem 1rem; }
+            .ticket-logos {
+                padding-top: 24px;
+            }
+            .ticket-logos img {
+                height: 24px;
+                width: 37px;
+            }
+            .ticket-qr img {
+                width: 100%;
+                max-width: 343px;
+                height: auto;
+                aspect-ratio: 1/1;
+            }
+            .ticket-number {
+                font-family:Arial, sans-serif;
+                font-size:20px;
+                line-height:28px;
+            }
+            .small-text { font-size: 12px; padding: 24px;margin: 0;border-top: 1px solid #ddd; font-family:Arial, sans-serif;line-height: 18px;}
             .border-bottom { margin: 1rem 0; }
+            .ticket-details div,
+            .ticket-details2 div {
+                flex-direction: column;      /* колоночная структура */
+                align-items: flex-start;     /* прижимаем к левому краю */
+                gap: 0.25rem;
+                padding: 12px 24px 12px 24px;/* отступ между label и info */
+            }
+
+            .ticket-details div:first-child,
+            .ticket-details2 div:first-child{
+                padding-top: 24px;
+            }
+            .ticket-details div:last-child,
+            .ticket-details2 div:last-child{
+                padding-bottom: 24px;
+            }
+            .border-bottom {
+                margin: 0;
+            }
+            .label {
+                font-family: Arial, sans-serif;
+                font-size: 14px;
+                line-height:20px;
+            }
+            .info {
+                font-family: Arial, sans-serif;
+                align-self: flex-start;
+                margin-left: 34px;
+                width: 100%;                 /* растягиваем на всю ширину */
+                font-weight: 600;
+                word-wrap: break-word;
+                font-size: 14px;
+                line-height:20px/* если текст длинный */
+            }
+
         }
     </style>
 </head>
@@ -272,10 +345,9 @@
                     </span>
                     <span class="info" id="birthdate"></span>
                 </div>
-                <div class="border-bottom_double"></div>
             </div>
             <div class="small-text">
-                Deutschlandweit gültig in allen Nahverkehrsmitteln (ÖPNV/SPNV)<br>2. Klasse
+                Deutschlandweit gültig in allen Nahverkehrsmitteln <br>(ÖPNV/SPNV) 2. Klasse
             </div>
         </div>
     </div>
